@@ -6,7 +6,7 @@ PKID is a public Key Indexed Datastore. You can save plain or encrypted data in 
 # install
 
 ```
-npm install pkid
+npm install @jimber/pkid
 ```
 
 # initialize
