@@ -3,7 +3,13 @@
 ## Concept
 PKID is a public Key Indexed Datastore. You can save plain or encrypted data in a public key index; as long as you are the owner of the secret corresponding to that public key.
 
-#initialize
+# install
+
+```
+npm install pkid
+```
+
+# initialize
 
 ```
 const pkid = require('pkid')
@@ -16,28 +22,17 @@ const client = new pkid(url)
 ### Set document
 
 ```
-PUT /v1/documents/{pk}/{key}
-```
-
-```
 client.setDocument(pk, key, document)
 ```
 
-Set the value of a document corresponding to {key} indexed by the public key {pk}. This is only possible when sending following header; signed by the secret key corresponding to {pk}.
+Set the value of a document corresponding to {key} indexed by the public key {pk}.
 
 pk is hex encoded;
 request data is a base64 encoded and signed;
 header is base64 encoded and signed;
 
-```
-{ 'intent' : 'pkid.store', timestamp: 'epochtime'}
-```
 
 ### Get document
-
-```
-GET /v1/documents/{pk}/{key}
-```
 
 ```
 client.getDocument(pk, key)
