@@ -1,0 +1,14 @@
+{
+  "name": "pkid",
+  "version": "1.0.0",
+  "description": "Lightweight node client for pkid",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "author": "Jimber <info@jimber.org>",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
