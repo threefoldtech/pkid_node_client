@@ -13,7 +13,7 @@ npm install @jimber/pkid
 
 ```
 const pkid = require('pkid')
-const client = new pkid(url)
+const client = new pkid(url, publicKey, privateKey)
 ```
 
 # Routes
@@ -22,24 +22,17 @@ const client = new pkid(url)
 ### Set document
 
 ```
-client.setDocument(pk, key, document)
+client.setDoc(key, document)
 ```
 
 Set the value of a document corresponding to {key} indexed by the public key {pk}.
-
-pk is hex encoded;
-request data is a base64 encoded and signed;
-header is base64 encoded and signed;
 
 
 ### Get document
 
 ```
-client.getDocument(pk, key)
+client.getDoc(pk, key)
 ```
-
-pk is hex encoded;
-response data is base64 encoded;
 
 Get the value of a document corresponding to {key} indexed by the public key {pk}. There is no requirement for a security header
 

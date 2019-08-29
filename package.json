@@ -4,12 +4,15 @@
   "description": "Lightweight node client for pkid",
   "main": "index.js",
   "scripts": {
+    "pre-test": "npm install && npm link && cd ./test && npm link @jimber/pkid",
     "test": "node test/test.js"
   },
   "author": "Jimber <info@jimber.org>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.0"
+    "axios": "^0.19.0",
+    "tweetnacl": "^1.0.1",
+    "tweetnacl-util": "^0.15.0"
   },
   "directories": {
     "test": "test"
