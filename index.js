@@ -26,6 +26,9 @@ class Pkid {
 				data: JSON.parse(encodeUTF8(verified)),
 				verified: true
 			}
+			return {
+				verified: false
+			}
 		}).catch(e => {
 			return e.response.data
 		})
