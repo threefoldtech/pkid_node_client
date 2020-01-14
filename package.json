@@ -4,8 +4,8 @@
   "description": "Lightweight node client for pkid",
   "main": "src/index.js",
   "scripts": {
-    "test": "standard; node test/test.js",
-    "debug": "npm link @jimber/pkid && node --nolazy --inspect-brk=9229 test/test.js"
+    "pretest": "standard src",
+    "test": "mocha"
   },
   "author": "Jimber <info@jimber.org>",
   "license": "ISC",
@@ -18,6 +18,7 @@
     "test": "test"
   },
   "devDependencies": {
+    "mocha": "^7.0.0",
     "standard": "^14.3.1"
   },
   "repository": {

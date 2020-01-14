@@ -10,13 +10,59 @@ const payload = 'test'
 
 console.log(key)
 
-client.setDoc(key, payload, true).then(r => {
-  console.log(r)
-  client.getDoc(sign.publicKey, key).then(r => {
-    console.log(r)
-  }).catch(e => {
-    console.log(e)
+// client.setDoc(key, payload, true).then(r => {
+//   console.log(r)
+//   client.getDoc(sign.publicKey, key).then(r => {
+//     console.log(r)
+//   }).catch(e => {
+//     console.log(e)
+//   })
+// }).catch(e => {
+//   console.error(e)
+// })
+
+var assert = require('assert')
+
+describe('Pkid', function () {
+  it('should be able to set document', function (done) {
+    client.setDoc(key, payload, false).then(r => {
+      assert.ok(true)
+      done()
+    }).catch(e => {
+      console.error(e)
+      assert.fail()
+    })
   })
-}).catch(e => {
-  console.error(e)
+
+  it('should be able get a previosly set document', function (done) {
+    client.getDoc(sign.publicKey, key).then(r => {
+      assert.strictEqual(r.data, payload)
+      done()
+    }).catch(e => {
+      console.log(e)
+      assert.fail()
+      done(e)
+    })
+  })
+
+  it('should be able to encrypt a document', function (done) {
+    client.getDoc(sign.publicKey, key, true).then(r => {
+      assert.strictEqual(r.data, payload)
+      done()
+    }).catch(e => {
+      console.log(e)
+      assert.fail()
+      done(e)
+    })
+  })
+
+  it('should be able to decrypt a previosly set document', function (done) {
+    client.setDoc(key, payload, true).then(r => {
+      assert.ok(true)
+      done()
+    }).catch(e => {
+      console.error(e)
+      assert.fail()
+    })
+  })
 })
