@@ -1,23 +1,22 @@
-const Pkid = require('@jimber/pkid')
+const Pkid = require('../index')
 const nacl = require('tweetnacl')
 
 const sign = nacl.sign.keyPair()
+const box = nacl.box.keyPair()
+const client = new Pkid('http://localhost:8080', sign.publicKey, sign.secretKey, box.publicKey, box.secretKey)
 
-const client = new Pkid('http://localhost:8080', sign.publicKey, sign.secretKey)
-
-const key = 'aaa'
+const key = 'something'
 const payload = 'test'
 
-client.setDoc(key, payload).then(r => {
-  console.log(r)
-}).catch(e => {
-  console.error(e)
-})
+console.log(key)
 
-setTimeout(() => {
+client.setDoc(key, payload, true).then(r => {
+  console.log(r)
   client.getDoc(sign.publicKey, key).then(r => {
     console.log(r)
   }).catch(e => {
     console.log(e)
   })
-}, 1500)
+}).catch(e => {
+  console.error(e)
+})
