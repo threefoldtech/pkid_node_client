@@ -1,4 +1,4 @@
-const Pkid = require('../index')
+const Pkid = require('../src')
 const nacl = require('tweetnacl')
 
 const sign = nacl.sign.keyPair()
