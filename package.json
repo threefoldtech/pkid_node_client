@@ -4,8 +4,8 @@
   "description": "Lightweight node client for pkid",
   "main": "index.js",
   "scripts": {
-    "pre-test": "npm install && npm link && cd ./test && npm link @jimber/pkid",
-    "test": "node test/test.js"
+    "pretest": "npm install && npm link && cd ./test && npm link @jimber/pkid",
+    "test": "standard; node test/test.js"
   },
   "author": "Jimber <info@jimber.org>",
   "license": "ISC",
@@ -17,7 +17,9 @@
   "directories": {
     "test": "test"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "standard": "^14.3.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JimberSoftware/pkid-node-client.git"
