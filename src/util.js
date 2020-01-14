@@ -1,4 +1,8 @@
-const { sign, box, randomBytes } = require('tweetnacl')
+const {
+  sign,
+  box,
+  randomBytes
+} = require('tweetnacl')
 const {
   decodeUTF8,
   encodeUTF8,
@@ -38,16 +42,15 @@ const decrypt = (messageWithNonce, pk, sk) => {
   return JSON.parse(base64DecryptedMessage)
 }
 
-function signEncode (payload, signSk) {
+const signEncode = (payload, signSk) => {
   const message = decodeUTF8(JSON.stringify(payload))
   return encodeBase64(sign(message, signSk))
 }
 
-function encodeHex (byteArray) {
-  return Array.from(byteArray, function (byte) {
-    return ('0' + (byte & 0xFF).toString(16)).slice(-2)
-  }).join('')
-}
+const encodeHex = byteArray => Array.from(
+  byteArray,
+  byte => ('0' + (byte & 0xFF).toString(16)).slice(-2)
+).join('')
 
 module.exports = {
   encrypt: encrypt,
