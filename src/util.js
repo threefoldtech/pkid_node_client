@@ -1,8 +1,7 @@
 const {
-  sign,
-  box,
   randomBytes
 } = require('tweetnacl')
+const sodium = require('libsodium-wrappers')
 const {
   decodeUTF8,
   encodeUTF8,
@@ -10,41 +9,44 @@ const {
   decodeBase64
 } = require('tweetnacl-util')
 
-const newNonce = () => randomBytes(24)
+const encrypt = async (json, bobPublicKey) => {
+  await sodium.ready
+  const message = decodeBase64(json)
 
-const encrypt = (json, pk, sk) => {
-  const nonce = newNonce()
-  const messageUint8 = decodeUTF8(JSON.stringify(json))
-  const boxstring = box(messageUint8, nonce, pk, sk)
+  bobPublicKey = sodium.crypto_sign_ed25519_pk_to_curve25519(bobPublicKey)
+  const encryptedMessage = sodium.crypto_box_seal(message, bobPublicKey)
 
-  const fullMessage = new Uint8Array(nonce.length + boxstring.length)
-  fullMessage.set(nonce)
-  fullMessage.set(boxstring, nonce.length)
+  const fullMessage = new Uint8Array(encryptedMessage.length)
 
-  return encodeBase64(fullMessage)
+  return encodeBase64(encryptedMessage)
 }
 
-const decrypt = (messageWithNonce, pk, sk) => {
-  const messageWithNonceAsUint8Array = decodeBase64(messageWithNonce)
-  const nonce = messageWithNonceAsUint8Array.slice(0, box.nonceLength)
-  const message = messageWithNonceAsUint8Array.slice(
-    box.nonceLength,
-    messageWithNonce.length
-  )
+const decrypt = async (ciphertext, bobPublicKey, bobSecretKey) => {
+  await sodium.ready
 
-  const decrypted = box.open(message, nonce, pk, sk)
+  ciphertext = decodeBase64(ciphertext)
+
+  bobPublicKey = sodium.crypto_sign_ed25519_pk_to_curve25519(bobPublicKey)
+  bobSecretKey = sodium.crypto_sign_ed25519_sk_to_curve25519(bobSecretKey)
+
+  const decrypted = sodium.crypto_box_seal_open(ciphertext, bobPublicKey, bobSecretKey)
 
   if (!decrypted) {
     return null
   }
 
-  const base64DecryptedMessage = encodeUTF8(decrypted)
-  return JSON.parse(base64DecryptedMessage)
+  const base64DecryptedMessage = encodeBase64(decrypted)
+  return base64DecryptedMessage
 }
 
-const signEncode = (payload, signSk) => {
+const sign = (message, privateKey) => {
+  return sodium.crypto_sign(message, privateKey)
+}
+
+const signEncode = (payload, secretKey) => {
   const message = decodeUTF8(JSON.stringify(payload))
-  return encodeBase64(sign(message, signSk))
+
+  return encodeBase64(sign(message, secretKey))
 }
 
 const encodeHex = byteArray => Array.from(
@@ -52,9 +54,14 @@ const encodeHex = byteArray => Array.from(
   byte => ('0' + (byte & 0xFF).toString(16)).slice(-2)
 ).join('')
 
+const generateKeypair = async () => {
+  await sodium.ready
+  return sodium.crypto_sign_keypair()
+}
 module.exports = {
   encrypt: encrypt,
   decrypt: decrypt,
   signEncode: signEncode,
-  encodeHex: encodeHex
+  encodeHex: encodeHex,
+  generateKeypair: generateKeypair,
 }

@@ -6,23 +6,35 @@ const {
 } = require('tweetnacl-util')
 const { decrypt, encodeHex, encrypt, signEncode } = require('./util')
 
+const ApiVersion = `v1`
+
 class Pkid {
-  constructor (nodeUrl, signPk, signSk, boxPk, boxSk) {
+
+  nodeUrl
+  keyPair
+
+
+  constructor (nodeUrl, keyPair) {
     this.nodeUrl = nodeUrl
-    this.signPk = signPk
-    this.signSk = signSk
-    this.boxPk = boxPk
-    this.boxSk = boxSk
+    this.keyPair = keyPair
   }
 
-  getDoc (signPk, key) {
-    return axios({
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      url: `${this.nodeUrl}/v1/documents/${encodeHex(signPk)}/${key}`
-    }).then(res => {
+  async getDoc (signPk, key) {
+
+    let res;
+    try {
+      res = await axios({
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        url: `${this.nodeUrl}/v1/documents/${encodeHex(signPk)}/${key}`
+      })
+    } catch (e) {
+      console.error(e)
+      return e.response.data
+    }
+
       const verified = sign.open(decodeBase64(res.data.data), signPk)
       if (!verified) {
         return {
@@ -39,8 +51,11 @@ class Pkid {
         }
       }
 
-      const decryptedData = decrypt(data.payload, this.boxPk, this.boxSk)
-
+      let decryptedData
+      try {
+        decryptedData = await decrypt(data.payload, this.keyPair.publicKey, this.keyPair.privateKey)
+      } catch (e) {
+      }
       if (!decryptedData) {
         return {
           verified: true,
@@ -53,36 +68,36 @@ class Pkid {
         verified: true,
         decrypted: true
       }
-    }).catch(e => {
-      console.error(e)
-      return e.response.data
-    })
   }
 
-  setDoc (key, payload, willEncrypt = false) {
+  async setDoc (key, payload, willEncrypt = false, publicKey = null) {
     const header = {
       intent: 'pkid.store',
       timestamp: (new Date()).getTime()
     }
 
+    const encryptionPublicKey = publicKey ? publicKey : this.keyPair.publicKey
+
+    const handledPayload = willEncrypt ? await encrypt(payload, encryptionPublicKey) : payload
+
     const payloadContainer = {
       is_encrypted: Boolean(willEncrypt),
-      payload: willEncrypt ? encrypt(payload, this.boxPk, this.boxSk) : payload
+      payload: handledPayload
     }
 
-    return axios({
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: signEncode(header, this.signSk)
-      },
-      data: JSON.stringify(signEncode(payloadContainer, this.signSk)),
-      url: `${this.nodeUrl}/v1/documents/${encodeHex(this.signPk)}/${key}`
-    }).then(res => {
-      return res.data
-    }).catch(e => {
-      return e.response.data
-    })
+    try {
+      return await axios({
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: signEncode(header, this.keyPair.privateKey)
+        },
+        data: JSON.stringify(signEncode(payloadContainer, this.keyPair.privateKey)),
+        url: `${this.nodeUrl}/${ApiVersion}/documents/${encodeHex(this.keyPair.publicKey)}/${key}`
+      })
+    } catch (e) {
+      return e
+    }
   }
 }
 
