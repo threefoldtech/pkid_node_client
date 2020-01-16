@@ -8,4 +8,7 @@ describe('Util', () => {
     expect(keyPair.privateKey).to.be.an('Uint8Array')
     expect(keyPair.publicKey).to.be.an('Uint8Array')
   })
+  it('should encrypt', async () => {
+    Util.encrypt()
+  })
 })

@@ -11,12 +11,10 @@ const {
 
 const encrypt = async (json, bobPublicKey) => {
   await sodium.ready
-  const message = decodeBase64(json)
+  const message = decodeUTF8(JSON.stringify(json))
 
   bobPublicKey = sodium.crypto_sign_ed25519_pk_to_curve25519(bobPublicKey)
   const encryptedMessage = sodium.crypto_box_seal(message, bobPublicKey)
-
-  const fullMessage = new Uint8Array(encryptedMessage.length)
 
   return encodeBase64(encryptedMessage)
 }
@@ -35,7 +33,7 @@ const decrypt = async (ciphertext, bobPublicKey, bobSecretKey) => {
     return null
   }
 
-  const base64DecryptedMessage = encodeBase64(decrypted)
+  const base64DecryptedMessage = encodeUTF8(decrypted)
   return base64DecryptedMessage
 }
 

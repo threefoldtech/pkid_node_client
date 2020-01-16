@@ -66,7 +66,7 @@ class Pkid {
 
       return {
         success: true,
-        data: decryptedData,
+        data: JSON.parse(decryptedData),
         verified: true,
         decrypted: true
       }

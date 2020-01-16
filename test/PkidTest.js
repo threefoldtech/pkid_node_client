@@ -88,4 +88,27 @@ describe('Pkid', () => {
     expect(result).to.be.an('object').that.not.includes.keys('success','data')
     expect(result.success).to.not.be.equal(true)
   })
+  it('should be able to get a previously set array value', async () => {
+    value = [{
+      test: value
+    }]
+    await client.setDoc(primaryKey, value)
+    const result = await client.getDoc(keyPair.publicKey, primaryKey)
+
+    expect(result).to.be.an('object').that.includes.keys('verified', 'data')
+    expect(result.verified).to.be.equal(true)
+    expect(result.data[0].test).to.be.equal(value[0].test)
+  })
+  it('should be able to get and decrypt a previously set and encrypted array value by another keypair by that pair', async () => {
+    value = [{
+      test: value
+    }]
+    await client.setDoc(primaryKey, value,true, secondKeyPair.publicKey)
+    const result = await secondClient.getDoc(keyPair.publicKey, primaryKey)
+
+    expect(result).to.be.an('object').that.includes.keys('decrypted','verified', 'data')
+    expect(result.verified).to.be.equal(true)
+    expect(result.decrypted).to.be.equal(true)
+    expect(result.data).to.eql(value)
+  })
 })
