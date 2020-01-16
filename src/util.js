@@ -54,9 +54,9 @@ const encodeHex = byteArray => Array.from(
   byte => ('0' + (byte & 0xFF).toString(16)).slice(-2)
 ).join('')
 
-const generateKeypair = async () => {
+const generateKeypair = async (keySeed = null) => {
   await sodium.ready
-  return sodium.crypto_sign_keypair()
+  return await sodium.crypto_sign_keypair(keySeed)
 }
 module.exports = {
   encrypt: encrypt,
