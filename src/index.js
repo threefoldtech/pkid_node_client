@@ -10,10 +10,6 @@ const ApiVersion = `v1`
 
 class Pkid {
 
-  nodeUrl
-  keyPair
-
-
   constructor (nodeUrl, keyPair) {
     this.nodeUrl = nodeUrl
     this.keyPair = keyPair
