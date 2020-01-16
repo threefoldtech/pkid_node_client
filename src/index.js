@@ -28,6 +28,7 @@ class Pkid {
       })
     } catch (e) {
       return {
+        status: e.response.status,
         error: e.message
       }
     }
