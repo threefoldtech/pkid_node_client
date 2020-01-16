@@ -27,13 +27,15 @@ class Pkid {
         url: `${this.nodeUrl}/v1/documents/${encodeHex(signPk)}/${key}`
       })
     } catch (e) {
-      console.error(e)
-      return e.response.data
+      return {
+        error: e.message
+      }
     }
 
       const verified = sign.open(decodeBase64(res.data.data), signPk)
       if (!verified) {
         return {
+          error: 'could not verify data',
           verified: false
         }
       }
@@ -42,6 +44,7 @@ class Pkid {
 
       if (!data.is_encrypted) {
         return {
+          success: true,
           data: data.payload,
           verified: true
         }
@@ -54,12 +57,14 @@ class Pkid {
       }
       if (!decryptedData) {
         return {
+          error: 'could not decrypt data',
           verified: true,
           decrypted: false
         }
       }
 
       return {
+        success: true,
         data: decryptedData,
         verified: true,
         decrypted: true

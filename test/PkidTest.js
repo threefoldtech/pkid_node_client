@@ -82,4 +82,10 @@ describe('Pkid', () => {
     expect(result.verified).to.be.equal(true)
     expect(result.decrypted).to.be.equal(false)
   })
+  it('should not be able to get a value which is not yet set', async () => {
+    const result = await client.getDoc(keyPair.publicKey, primaryKey)
+
+    expect(result).to.be.an('object').that.not.includes.keys('success','data')
+    expect(result.success).to.not.be.equal(true)
+  })
 })
