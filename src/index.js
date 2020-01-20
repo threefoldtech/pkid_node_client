@@ -7,6 +7,7 @@ const {
 const { decrypt, encodeHex, encrypt, signEncode } = require('./util')
 
 const ApiVersion = `v1`
+const dataVersion = 1;
 
 class Pkid {
 
@@ -27,8 +28,12 @@ class Pkid {
         url: `${this.nodeUrl}/v1/documents/${encodeHex(signPk)}/${key}`
       })
     } catch (e) {
+      let status = 'no_status'
+      if(e.response && e.response.status){
+        status = e.response.status
+      }
       return {
-        status: e.response.status,
+        status: status,
         error: e.message
       }
     }
@@ -47,7 +52,8 @@ class Pkid {
         return {
           success: true,
           data: data.payload,
-          verified: true
+          verified: true,
+          data_version:data.data_version
         }
       }
 
@@ -60,7 +66,8 @@ class Pkid {
         return {
           error: 'could not decrypt data',
           verified: true,
-          decrypted: false
+          decrypted: false,
+          data_version:data.data_version
         }
       }
 
@@ -68,7 +75,8 @@ class Pkid {
         success: true,
         data: JSON.parse(decryptedData),
         verified: true,
-        decrypted: true
+        decrypted: true,
+        data_version:data.data_version
       }
   }
 
@@ -84,7 +92,8 @@ class Pkid {
 
     const payloadContainer = {
       is_encrypted: Boolean(willEncrypt),
-      payload: handledPayload
+      payload: handledPayload,
+      data_version:dataVersion
     }
 
     try {
