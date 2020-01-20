@@ -2,22 +2,27 @@
   "name": "@jimber/pkid",
   "version": "1.0.2",
   "description": "Lightweight node client for pkid",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "pre-test": "npm install && npm link && cd ./test && npm link @jimber/pkid",
-    "test": "node test/test.js"
+    "pretest": "standard src",
+    "test": "mocha"
   },
   "author": "Jimber <info@jimber.org>",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.0",
+    "libsodium-wrappers": "^0.7.6",
     "tweetnacl": "^1.0.1",
     "tweetnacl-util": "^0.15.0"
   },
   "directories": {
     "test": "test"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.0.0",
+    "standard": "^14.3.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JimberSoftware/pkid-node-client.git"
