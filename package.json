@@ -1,6 +1,6 @@
 {
   "name": "@jimber/pkid",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lightweight node client for pkid",
   "main": "index.js",
   "scripts": {
