@@ -4,6 +4,8 @@ import { encodeUTF8, decodeBase64 } from 'tweetnacl-util';
 import { decrypt, encodeHex, encrypt, signEncode } from './util';
 import { KeyPair } from 'libsodium-wrappers';
 
+export * from './util';
+
 const ApiVersion = `v1`;
 const dataVersion = 1;
 
@@ -141,25 +143,11 @@ export default class Pkid {
     };
   }
 
-  async setNamespace(requestNamespace: string, signedPayload: string, signedHeader: string) {
-    //const header = {
-    //  intent: 'pkid.store',
-    //  timestamp: new Date().getTime(),
-    //};
-
-    const payloadContainer = {
-      payload: signedPayload,
-      data_version: dataVersion,
-    };
-
-    try {
-      return await axios({
-        method: 'PUT',
-        data: payloadContainer,
-        url: `${this.nodeUrl}/${ApiVersion}/name-service/${requestNamespace}`,
-      });
-    } catch (e) {
-      return e;
-    }
+  async setNamespace(requestNamespace: string, signedPayload: string) {
+    return axios({
+      method: 'PUT',
+      data: JSON.stringify(signedPayload),
+      url: `${this.nodeUrl}/${ApiVersion}/name-service/${requestNamespace}`,
+    });
   }
 }
