@@ -2,7 +2,8 @@ import typescript from 'rollup-plugin-typescript2';
 import ttypescript from 'ttypescript';
 
 import json from '@rollup/plugin-json';
-import path from 'path'
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 
 const config = [
   {
@@ -39,6 +40,10 @@ const config = [
         emitDeclarationOnly: true,
       }),
       json(),
+      nodeResolve({
+        preferBuiltins: true,
+      }),
+      commonjs(),
     ],
   },
 ];
