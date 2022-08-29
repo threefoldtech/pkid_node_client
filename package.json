@@ -2,8 +2,9 @@
   "name": "@jimber/pkid",
   "version": "1.0.4",
   "description": "Lightweight node client for pkid",
-  "main": "dist/index.js",
-  "typings": "dist/types/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
+  "types": "dist/types/src/index.d.ts",
   "scripts": {
     "pretest": "standard src",
     "test": "mocha",
