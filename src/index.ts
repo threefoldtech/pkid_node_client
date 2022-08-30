@@ -4,14 +4,13 @@ import { encodeUTF8, decodeBase64 } from 'tweetnacl-util';
 import { decrypt, encodeHex, encrypt, signEncode } from './util';
 import { KeyPair } from 'libsodium-wrappers';
 
+export * from './util';
+
 const ApiVersion = `v1`;
 const dataVersion = 1;
 
 export default class Pkid {
-  constructor(
-    private readonly nodeUrl: string,
-    private readonly keyPair: KeyPair,
-  ) {}
+  constructor(private readonly nodeUrl: string, private readonly keyPair: KeyPair) {}
 
   async getDoc<T>(signPk: Uint8Array, requestKey: string) {
     let res;
@@ -55,11 +54,7 @@ export default class Pkid {
 
     let decryptedData;
     try {
-      decryptedData = await decrypt(
-        data.payload,
-        this.keyPair.publicKey,
-        this.keyPair.privateKey,
-      );
+      decryptedData = await decrypt(data.payload, this.keyPair.publicKey, this.keyPair.privateKey);
     } catch (e) {}
     if (!decryptedData) {
       return {
@@ -79,12 +74,7 @@ export default class Pkid {
     };
   }
 
-  async setDoc<T>(
-    requestKey: string,
-    payload: T,
-    willEncrypt: boolean = false,
-    publicKey?: Uint8Array,
-  ) {
+  async setDoc<T>(requestKey: string, payload: T, willEncrypt: boolean = false, publicKey?: Uint8Array) {
     const header = {
       intent: 'pkid.store',
       timestamp: new Date().getTime(),
@@ -92,9 +82,7 @@ export default class Pkid {
 
     const encryptionPublicKey = publicKey ? publicKey : this.keyPair.publicKey;
 
-    const handledPayload = willEncrypt
-      ? await encrypt<T>(payload, encryptionPublicKey)
-      : payload;
+    const handledPayload = willEncrypt ? await encrypt<T>(payload, encryptionPublicKey) : payload;
 
     const payloadContainer = {
       is_encrypted: Boolean(willEncrypt),
@@ -109,15 +97,57 @@ export default class Pkid {
           'Content-Type': 'application/json',
           Authorization: signEncode(header, this.keyPair.privateKey),
         },
-        data: JSON.stringify(
-          signEncode(payloadContainer, this.keyPair.privateKey),
-        ),
-        url: `${this.nodeUrl}/${ApiVersion}/documents/${encodeHex(
-          this.keyPair.publicKey,
-        )}/${requestKey}`,
+        data: JSON.stringify(signEncode(payloadContainer, this.keyPair.privateKey)),
+        url: `${this.nodeUrl}/${ApiVersion}/documents/${encodeHex(this.keyPair.publicKey)}/${requestKey}`,
       });
     } catch (e) {
       return e;
     }
+  }
+
+  async getNamespace<T>(requestNamespace: string, namespacePubKey: Uint8Array) {
+    let res;
+    try {
+      res = await axios({
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        url: `${this.nodeUrl}/v1/name-service/${requestNamespace}`,
+      });
+    } catch (e) {
+      let status = 'no_status';
+      if (e.response && e.response.status) {
+        status = e.response.status;
+      }
+      return {
+        status: status,
+        error: e.message,
+      };
+    }
+
+    const verified = sign.open(decodeBase64(res.data.data), namespacePubKey);
+    if (!verified) {
+      return {
+        error: 'could not verify data',
+        verified: false,
+      };
+    }
+
+    const data = JSON.parse(encodeUTF8(verified)) as T;
+
+    return {
+      success: true,
+      verified: true,
+      data,
+    };
+  }
+
+  async setNamespace(requestNamespace: string, signedPayload: string) {
+    return axios({
+      method: 'PUT',
+      data: JSON.stringify(signedPayload),
+      url: `${this.nodeUrl}/${ApiVersion}/name-service/${requestNamespace}`,
+    });
   }
 }
