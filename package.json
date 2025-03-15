@@ -13,7 +13,7 @@
   "author": "Jimber <info@jimber.org>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^0.29.0",
     "libsodium-wrappers": "^0.7.6",
     "tweetnacl": "^1.0.1",
     "tweetnacl-util": "^0.15.0"
